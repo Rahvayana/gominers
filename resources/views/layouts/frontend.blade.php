@@ -10,7 +10,7 @@
     <link rel="icon" href="../favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Caveat" rel="stylesheet">
-    <title>DashCore - Premium Software & Startup HTML</title><!-- themeforest:css -->
+    <title>Gominers - Miner Website</title><!-- themeforest:css -->
     <link rel="stylesheet" href="/frontend/css/fontawesome.css">
     <link rel="stylesheet" href="/frontend/css/aos.css">
     <link rel="stylesheet" href="/frontend/css/cookieconsent.min.css">
@@ -42,8 +42,8 @@
                 </li>
                 @else
                 <li class="st-nav-section st-nav-secondary nav-item">
-                    <a class="btn btn-rounded btn-outline me-3 px-3" href="{{ route('frn.customer.login-view') }}" target="_blank"><i class="fas fa-sign-in-alt d-none d-md-inline me-md-0 me-lg-2"></i> <span class="d-md-none d-lg-inline">Login</span> </a>
-                    <a class="btn btn-rounded btn-solid px-3" href="{{ route('frn.customer.register-view') }}" target="_blank"><i class="fas fa-user-plus d-none d-md-inline me-md-0 me-lg-2"></i> <span class="d-md-none d-lg-inline">Signup</span></a>
+                    <a class="btn btn-rounded btn-outline me-3 px-3" href="{{ route('frn.customer.login-view') }}" ><i class="fas fa-sign-in-alt d-none d-md-inline me-md-0 me-lg-2"></i> <span class="d-md-none d-lg-inline">Login</span> </a>
+                    <a class="btn btn-rounded btn-solid px-3" href="{{ route('frn.customer.register-view') }}" ><i class="fas fa-user-plus d-none d-md-inline me-md-0 me-lg-2"></i> <span class="d-md-none d-lg-inline">Signup</span></a>
                 </li>
                 <!-- Mobile Navigation -->
                 @endif
@@ -260,7 +260,7 @@
                         <p class="font-md m-0">Check your email</p>
                         <p class="response">We sent you an email with a link to get started. You’ll be in your account in no time.</p>
                     </div>
-                    <h6 class="bold text-contrast mt-5 pb-1">Download the app</h6>
+                    <h6 class="bold text-contrast mt-5 pb-1">Coming Soon</h6>
                     <nav class="nav flex-column flex-md-row justify-content-center justify-content-md-start align-items-center"><a href="#" class="nav-link py-3 btn btn-download btn-darker text-light me-0 me-md-4 mb-4 mb-md-0"><img src="/frontend/img/svg/apple.svg" class="icon icon-md" alt="...">
                             <p class="ms-2"><span class="small light">Get it on the</span> <span class="d-block bold text-contrast">App Store</span></p>
                         </a><a href="#" class="nav-link py-3 btn btn-download btn-darker text-light"><img src="/frontend/img/svg/google-play.svg" class="icon icon-md" alt="...">

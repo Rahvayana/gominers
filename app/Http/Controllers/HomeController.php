@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Post;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -13,10 +16,10 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth',['except' => ['index']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth',['except' => ['index']]);
+    // }
 
     /**
      * Show the application dashboard.
@@ -50,6 +53,7 @@ class HomeController extends Controller
 
         $data['blogs']=DB::table('posts')->select('posts.*','users.name as author','users.foto')->where('category','tips')
         ->leftJoin('users','users.id','posts.user_id')->orderBy('created_at','DESC')->get();
+        $data['products']=Product::orderBy('created_at','DESC')->get();
         // dd($data);
 
         return view('frontend.home.index',$data);
@@ -63,5 +67,34 @@ class HomeController extends Controller
         ->leftJoin('users','users.id','posts.user_id')->where('slug','!=',$slug)->take(4)->get();
         // dd($data);
         return view('frontend.home.blog-detail',$data);
+    }
+
+    public function detailProduct($slug)
+    {
+        $data['product']=Product::where('slug',$slug)->first();
+        return view('frontend.home.shop-detail',$data);
+
+    }
+
+    public function addCart(Request $request)
+    {
+        $product=Product::where('slug',$request->slug)->first();
+        $qty=Cart::where('product_id',$product->id)->where('user_id',Auth::guard('customer')->id())->first();
+        $cart=new Cart();
+        if($qty){
+            $cart=Cart::find($qty->id);
+        }
+        $cart->user_id=Auth::guard('customer')->id();
+        $cart->product_id=$product->id;
+        if ($qty) {
+            $jml=$qty->qty+1;
+        } else {
+            $jml=1;
+        }
+
+        $cart->qty=$jml;
+        $cart->save();
+
+        return response()->json($product);
     }
 }

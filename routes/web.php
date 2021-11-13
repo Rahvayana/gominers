@@ -4,6 +4,8 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OngkirController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +22,11 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/blog/{slug}', [HomeController::class, 'detailBlog'])->name('blog.detail');
+Route::get('/product/{slug}', [HomeController::class, 'detailProduct'])->name('product.detail');
+Route::post('/add-product-cart', [HomeController::class, 'addCart'])->name('product.add-cart');
+Route::post('/order', [CustomerController::class, 'order'])->name('product.order');
+
+
 
 
 Route::prefix('user')->group(function () {
@@ -31,8 +38,15 @@ Route::prefix('user')->group(function () {
     Route::post('/forgot-password', [CustomerController::class, 'handleForgot'])->name('frn.customer.forgot-process');
     Route::post('/forgot-password/{id}', [CustomerController::class, 'changePassword'])->name('frn.customer.change-password');
     Route::get('/logout', [CustomerController::class, 'logout'])->name('frn.customer.logout');
-    Route::get('/dashboard', [CustomerController::class, 'detail'])->name('frn.customer.detail');
+    Route::get('/dashboard-profile', [CustomerController::class, 'detail'])->name('frn.customer.detail');
+    Route::get('/dashboard-shop', [CustomerController::class, 'shop'])->name('frn.customer.shop');
     Route::post('/update-profile', [CustomerController::class, 'update'])->name('frn.customer.update');
+    Route::get('/add-product', [CustomerController::class, 'addProduct'])->name('frn.customer.shop-add');
+    Route::post('/save-product', [CustomerController::class, 'saveProduct'])->name('frn.customer.shop-save');
+    Route::get('/checkout', [CustomerController::class, 'checkout'])->name('frn.customer.checkout');
+    Route::post('/delete-cart', [CustomerController::class, 'deleteCart'])->name('frn.customer.delete-cart');
+    Route::post('/process-cart', [CustomerController::class, 'processCart'])->name('frn.customer.process-cart');
+    Route::post('/update-shop', [CustomerController::class, 'updateShop'])->name('frn.customer.update-shop');
     
 });
 //Email Verification
@@ -40,6 +54,13 @@ Route::post('/email/resend', [CustomerController::class, 'resend'])->name('verif
 Route::get('/email/verify/{email}', [CustomerController::class, 'verify'])->name('verification.verify');
 Route::get('/email/forgot/{email}', [CustomerController::class, 'forgotPassword'])->name('forgotpassword-view');
 Route::get('/kota/{id}', [CustomerController::class, 'kota'])->name('kota');
+Route::post('/otp-verification/', [CustomerController::class, 'otpSend'])->name('otp-sent');
+Route::post('/otp-verify/', [CustomerController::class, 'otpVerif'])->name('otp-verify');
+
+//Raja Ongkir
+Route::get('/provinsi', [OngkirController::class, 'provinsi']);
+Route::get('/provinsi/{id}', [OngkirController::class, 'kota']);
+Route::post('/cost/', [OngkirController::class, 'cost']);
 
 
 Route::prefix('admin')->group(function () {
@@ -54,6 +75,9 @@ Route::prefix('admin')->group(function () {
     Route::get('/add-blog', [BlogController::class, 'addBlog'])->name('bcn.post.add-blog');
     Route::post('/add-blog-image', [BlogController::class, 'imageUpload'])->name('cms.blog.image.upload');
     Route::post('/save-blog', [BlogController::class, 'storeBlog'])->name('bcn.post.store-blog');
+
+    //Products
+    Route::get('/products', [ProductController::class, 'index'])->name('bcn.post.product');
 
 });
 

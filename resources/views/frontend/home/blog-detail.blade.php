@@ -12,6 +12,7 @@
                 <div class="blog-post post-content pb-5">
                     <p>{{$blog->desc}}</p>
                     <hr>
+                    <img src="/{{$blog->thumbnail}}" alt="Thumbnail Post">
                     <p>{!!$blog->content!!}</p>
                 </div>
                 <div class="post-author py-5 b-t b-2x">

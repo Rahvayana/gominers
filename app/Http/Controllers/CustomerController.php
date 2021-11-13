@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Mail\CustomerForgotPassword;
 use App\Mail\CustomerVerification;
+use App\Models\Cart;
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Province;
 use App\Models\Regencie;
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CustomerController extends Controller
 {
@@ -127,7 +132,9 @@ class CustomerController extends Controller
             $data['provinces']=Province::all();
             $data['regencies']=Regencie::all();
             // dd($data);
-            return view('frontend.home.profile',$data);
+            $data['shop']=Shop::where('user_id',Auth::guard('customer')->id())->first();
+            // dd($data);
+            return view('frontend.home.dashboard.profile',$data);
         }else{
             return redirect()->route('home')->with('failed', 'Not Login');;
         }
@@ -150,5 +157,153 @@ class CustomerController extends Controller
     {
         $provinces=Regencie::where('province_id',$id)->get();
         return response()->json($provinces);
+    }
+
+    public function otpSend(Request $request)
+    {
+        $customer=new Customer();
+        $customer=Customer::find(Auth::guard('customer')->id());
+        $customer->no_hp=$request->number_phone;
+        $customer->otp=$this->intCodeRandom();
+        $customer->save();
+        if($customer){
+            return response()->json('Berhasil Mengirim OTP');
+        }
+
+    }
+
+    public function otpVerif(Request $request)
+    {
+        $otp=DB::table('customers')->select('otp')->where('id',Auth::guard('customer')->id())->first();
+        if($otp->otp==$request->otpnumber){
+            $customer=new Customer();
+            $customer=Customer::find(Auth::guard('customer')->id());
+            $customer->seller=1;
+            $customer->save();
+            return response()->json('Berhasil Mendaftar Sebagai Merchant',200);
+        }else{
+            return response()->json('Nomor OTP Salah',200);
+        }
+    }
+
+    public function intCodeRandom($length = 6)
+    {
+      $intMin = (10 ** $length) / 10; // 100...
+      $intMax = (10 ** $length) - 1;  // 999...
+
+      $codeRandom = mt_rand($intMin, $intMax);
+
+      return $codeRandom;
+    }
+
+    public function shop()
+    {
+        
+        if ((Auth::guard('customer')->id()) != null&&Auth::guard('customer')->user()->seller==1) {
+            $data['products']=Product::where('user_id',Auth::guard('customer')->id())->get();
+            // dd($data);
+            return view('frontend.home.dashboard.shop',$data);
+        }else{
+            return redirect()->route('home')->with('failed', 'Not Login');;
+        }
+    }
+
+    public function addProduct()
+    {
+        return view('frontend.home.dashboard.add-product');
+    }
+
+    public function saveProduct(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'harga' => 'required',
+            'desc' => 'required',
+            'image' => 'required',
+            'qty' => 'required',
+        ]);
+        $slug = Str::slug($request->name, '-');
+        $imageName1 = time().'-'.rand() . '.' . $request->image->extension();
+        $request->image->move('images/products/', $imageName1);
+
+        $product=new Product();
+        $product->title=$request->name;
+        $product->user_id=Auth::guard('customer')->id();
+        $product->image='images/products/' . $imageName1;
+        $product->type=$request->type;
+        $product->slug=$slug;
+        $product->category=$request->category;
+        $product->harga=$request->harga;
+        $product->desc=$request->desc;
+        $product->qty=$request->qty;
+        $product->save();
+        if ($product) {
+            return redirect()->route('frn.customer.shop')->with('success', 'Adding New Product Success');
+        } else {
+            return redirect()->route('frn.customer.shop')->with('failed', 'Adding New Product Failed');
+        }
+    }
+
+    public function checkout()
+    {
+        $data['products']=DB::table('carts')->select('products.*','carts.qty','carts.id as cart_id')
+        ->leftJoin('products','products.id','carts.product_id')
+        ->where('carts.user_id',Auth::guard('customer')->id())->get();
+        return view('frontend.home.dashboard.cart',$data);
+    }
+
+    public function deleteCart(Request $request)
+    {
+        $cart=Cart::find($request->id);
+        $cart->delete();
+        return response()->json($cart);
+    }
+
+    public function processCart(Request $request)
+    {
+        $carts=Cart::where('user_id',Auth::guard('customer')->id())->get();
+        foreach($carts as $key=>$cart){
+            $product=DB::table('products')->select('products.*')
+            ->where('id',$cart->product_id)->first();
+            if($product){
+                $data['carts'][]=[
+                    'id'=>$product->id,
+                    'title'=>$product->title,
+                    'harga'=>$product->harga,
+                    'image'=>$product->image,
+                    'qty'=>$request->qty[$key],
+                    'total'=>$request->qty[$key]*$product->harga,
+                ];
+            }else{
+                return redirect()->back()->with('failed','Error Product ID');
+            }
+        }        
+        // dd($data);
+        return view('frontend.home.dashboard.checkout',$data);
+        
+    }
+
+    public function order(Request $request)
+    {
+        dd($request);
+    }
+
+    public function updateShop(Request $request)
+    {
+        $request->validate([
+            'shop_name' => 'required',
+            'province' => 'required',
+            'origin' => 'required',
+        ]);
+
+        $shop=new Shop();
+        $shop->user_id=Auth::guard('customer')->id();
+        $shop->name=$request->shop_name;
+        $shop->shippings=json_encode($request->shipments);
+        $shop->province=$request->province;
+        $shop->origin=$request->origin;
+        $shop->save();
+
+        return redirect()->back();
     }
 }

@@ -10,7 +10,7 @@
     <link rel="icon" href="favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Caveat" rel="stylesheet">
-    <title>DashCore - Premium Software & Startup HTML</title><!-- themeforest:css -->
+    <title>Gominers - Login</title><!-- themeforest:css -->
     <link rel="stylesheet" href="/frontend/css/fontawesome.css">
     <link rel="stylesheet" href="/frontend/css/aos.css">
     <link rel="stylesheet" href="/frontend/css/cookieconsent.min.css">

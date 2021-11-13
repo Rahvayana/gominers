@@ -926,7 +926,7 @@
                                 <a href="{{ route('bcn.post.blog') }}"><span class="lnr icon-notebook"></span>Posts</a>
                             </li>
                             <li>
-                                <a href="dashboard-statement.html"><span class="lnr icon-chart"></span>Statements</a>
+                                <a href="{{ route('bcn.post.product') }}"><span class="lnr icon-basket-loaded"></span>Products</a>
                             </li>
                             <li>
                                 <a href="dashboard-upload.html"><span class="lnr icon-cloud-upload"></span>Upload Items</a>
