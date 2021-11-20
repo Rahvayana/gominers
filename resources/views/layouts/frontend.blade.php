@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/frontend/css/rtl.css">
     <link rel="stylesheet" href="/frontend/css/demo.css">
     <!-- endinject -->
+    @yield('style')
 </head>
 
 <body>
@@ -237,6 +238,7 @@
             </div>
         </div>
     </nav>
+    <main class="overflow-hidden">
     @yield('content')
     <footer class="site-footer section bg-dark">
         <div class="container pb-5">
@@ -316,6 +318,7 @@
             </div>
         </div>
     </footer>
+    </main>
     <!-- themeforest:js -->
     <script src="/frontend/js/jquery.js"></script>
     <script src="/frontend/js/bootstrap.bundle.js"></script>

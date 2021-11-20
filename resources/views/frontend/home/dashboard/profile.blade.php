@@ -1,4 +1,6 @@
 @extends('layouts.frontend')
+@section('style')
+@endsection
 @section('content')
 <main class="overflow-hidden">
     <section class="checkout-header page header bg-dark section">
@@ -47,6 +49,22 @@
         <div class="container pt-0 mt-n8">
             <div class="row">
                 <div class="col-lg-12 pt-9">
+                    @if(Session::has('success'))
+                    <div class="col-lg-12">
+                        <div class="alert alert-success" style="margin-top: -70px;">{{Session::get('success')}}</div>
+                    </div>
+                    @endif
+                    @if ($errors->any())
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li style="text-decoration: none;">{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    @endif
                     @if (Auth::guard('customer')->user()->email_verified_at==null)
                     <div class="col-lg-12 mb-30">
                         <div class="card">
@@ -123,6 +141,9 @@
                                 <h4 class="border-bottom pb-3 bold">Daftar Toko</h4>
                                 <p class="small text-muted">Anda bisa mendaftarkan sebagai akun toko dengan menekan tombol dibawah ini.</p>
                                 <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Daftar Akun Merchant</a>
+                            @elseif (Auth::guard('customer')->user()->seller==2)
+                                <h4 class="border-bottom pb-3 bold">Verifikasi Admin</h4>
+                                <p class="small text-muted">Verifikasi dalam tahap pengecekan oleh Admin, mohon tunggu 1X24 Jam.</p>
                             @else
                                 <div class="rounded bg-info shadow p-4 ps-6">
                                     <div>
@@ -133,32 +154,47 @@
                                 <form method="POST" action="{{ route('frn.customer.update-shop') }}">@csrf
                                     <div class="form-group">
                                         <label for="email" class="form-label">Shop Name</label>
-                                        <input type="text" class="form-control" placeholder="Shop Name" name="shop_name" value="{{$shop->name}}">
+                                        <input type="text" class="form-control" placeholder="Shop Name" name="shop_name" value="{{$shop->name??''}}">
                                     </div>
                                     <div class="form-group">
                                         <legend class="bold small text-uppercase text-dark">Shipment Choice</legend>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
+                                                    @if (isset($shop->shippings))
                                                     <div class="form-check-list">
+                                                        @php
+                                                            $shippings=json_decode($shop->shippings);
+                                                        @endphp
+                                                        @foreach (json_decode($shipments->shipments) as $key=>$shipment)
+                                                        @if (in_array($shipment,$shippings))
                                                         <div class="checkbox checkbox-dark">
-                                                            <input type="checkbox" name="shipments[]" value="jne" id="exampleCheckColorStyledDark1">
-                                                            <label for="exampleCheckColorStyledDark1">JNE</label>
-                                                        </div>
+                                                            <input type="checkbox" checked name="shipments[]" value="{{$shipment}}" id="exampleCheckColorStyledDark{{$key}}">
+                                                            <label for="exampleCheckColorStyledDark{{$key}}">{{strtoupper($shipment)}}</label>
+                                                        </div>  
+                                                        @else
                                                         <div class="checkbox checkbox-dark">
-                                                            <input type="checkbox" name="shipments[]" value="pos" id="exampleCheckColorStyledDark2">
-                                                            <label for="exampleCheckColorStyledDark2">POS</label>
-                                                        </div>
-                                                        <div class="checkbox checkbox-dark">
-                                                            <input type="checkbox" name="shipments[]" value="tiki" id="exampleCheckColorStyledDark3">
-                                                            <label for="exampleCheckColorStyledDark3">TIKI</label>
-                                                        </div>
+                                                            <input type="checkbox" name="shipments[]" value="{{$shipment}}" id="exampleCheckColorStyledDark{{$key}}">
+                                                            <label for="exampleCheckColorStyledDark{{$key}}">{{strtoupper($shipment)}}</label>
+                                                        </div>  
+                                                        @endif
+                                                        @endforeach
                                                     </div>
+                                                    @else
+                                                    @foreach (json_decode($shipments->shipments) as $key=>$shipment)
+                                                    <div class="checkbox checkbox-dark">
+                                                        <input type="checkbox" name="shipments[]" value="{{$shipment}}" id="exampleCheckColorStyledDark{{$key}}">
+                                                        <label for="exampleCheckColorStyledDark{{$key}}">{{strtoupper($shipment)}}</label>
+                                                    </div>  
+                                                    @endforeach
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <input type="hidden" name="curr_province" id="curr_province" value="{{$shop->province??''}}">
+                                        <input type="hidden" name="curr_origin" id="curr_origin" value="{{$shop->origin??''}}">
                                         <label class="control-label text-darker" for="province">Provinsi</label>
                                         <select class="form-control" id="province" name="province">
                                             <option value=''>Pilih Provinsi</option>
@@ -181,6 +217,37 @@
         </div>
     </section>
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Konfirmasi Data Diri</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="otpStatus"></div>
+                <form method="POST" action="{{ route('frn.customer.upgrade') }}" enctype="multipart/form-data">@csrf
+                    <div class="form-group">
+                        <label for="email" class="form-label">NIK</label>
+                        <input type="number" class="form-control" id="nik_number" name="nik" placeholder="352XXXXXXXXX" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">KTP</label>
+                        <input type="file" class="form-control" id="ktp" name="ktp" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="form-label">Selfie + KTP</label>
+                        <input type="file" class="form-control" name="selfie_ktp" id="selfie_ktp" value="">
+                    </div>
+            </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Daftar Merchant</button>
+                    </div>
+                </form>
+          </div>
+        </div>
+    </div>
+    {{-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -208,7 +275,7 @@
             </div>
           </div>
         </div>
-    </div>
+    </div> --}}
     <div class="position-relative">
         <div class="shape-divider shape-divider-bottom shape-divider-fluid-x text-dark"><svg viewBox="0 0 2880 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0 48H1437.5H2880V0H2160C1442.5 52 720 0 720 0H0V48Z"></path>
@@ -219,6 +286,7 @@
 @section('script')
 <script>
 $(document).ready(function(){
+    var curr_province=$("#curr_province").val()
     $.ajax({
         url : "/provinsi",
         method : "GET",
@@ -230,12 +298,22 @@ $(document).ready(function(){
             $("#province").empty()
             $("#province").append("<option value=''>Pilih Provinsi</option>")
             for (let index = 0; index < province.length; index++) {
-                $("#province").append("<option value='"+province[index].province_id+"'>"+province[index].province+"</option>")
+                if(province[index].province_id==curr_province){
+                    $("#province").append("<option selected value='"+province[index].province_id+"'>"+province[index].province+"</option>")
+                    cekOrigin(curr_province)
+                }else{
+                    $("#province").append("<option value='"+province[index].province_id+"'>"+province[index].province+"</option>")
+                }
             }
         }
     });
     $('#province').change(function(){
         var id=$(this).val();
+        cekOrigin(id)
+    });
+
+    function cekOrigin(id){
+        var curr_origin=$("#curr_origin").val()
         $.ajax({
             url : "/provinsi/"+id,
             method : "GET",
@@ -247,11 +325,15 @@ $(document).ready(function(){
                 $("#origin").empty()
                 $("#origin").append("<option value=''>Pilih Kota</option>")
                 for (let index = 0; index < city.length; index++) {
-                    $("#origin").append("<option value='"+city[index].city_id+"'>"+city[index].city_name+"</option>")
+                    if(city[index].city_id==curr_origin){
+                        $("#origin").append("<option selected value='"+city[index].city_id+"'>"+city[index].type+" "+city[index].city_name+"</option>")
+                    }else{
+                        $("#origin").append("<option value='"+city[index].city_id+"'>"+city[index].type+" "+city[index].city_name+"</option>")
+                    }
                 }
             }
         });
-    });
+    }
     $('#provinsi').change(function(){
         var id=$(this).val();
         $.ajax({

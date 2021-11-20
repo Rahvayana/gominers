@@ -1,4 +1,12 @@
 @extends('layouts.frontend')
+@section('style')
+    <style>
+        p{
+            word-wrap: break-word;
+            
+        }
+    </style>
+@endsection
 @section('content')
 <header class="page header text-contrast bg-primary">
     <div class="container">
@@ -12,7 +20,7 @@
                 <div class="blog-post post-content pb-5">
                     <p>{{$blog->desc}}</p>
                     <hr>
-                    <img src="/{{$blog->thumbnail}}" alt="Thumbnail Post">
+                    <img src="/{{$blog->thumbnail}}" alt="Thumbnail Post" width="100%">
                     <p>{!!$blog->content!!}</p>
                 </div>
                 <div class="post-author py-5 b-t b-2x">

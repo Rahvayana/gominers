@@ -204,7 +204,7 @@
                     $("#kota").empty()
                     $("#kota").append("<option value=''>Pilih Kota</option>")
                     for (let index = 0; index < city.length; index++) {
-                        $("#kota").append("<option value='"+city[index].city_id+"'>"+city[index].city_name+"</option>")
+                        $("#kota").append("<option value='"+city[index].city_id+"'>"+city[index].type+" "+city[index].city_name+"</option>")
                     }
                 }
             });

@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::post('/order', [CustomerController::class, 'order'])->name('product.order
 
 
 
+
+
 Route::prefix('user')->group(function () {
     Route::get('/login', [CustomerController::class, 'login'])->name('frn.customer.login-view');
     Route::post('/login', [CustomerController::class, 'handleLogin'])->name('frn.customer.login-process');
@@ -41,6 +44,7 @@ Route::prefix('user')->group(function () {
     Route::get('/dashboard-profile', [CustomerController::class, 'detail'])->name('frn.customer.detail');
     Route::get('/dashboard-shop', [CustomerController::class, 'shop'])->name('frn.customer.shop');
     Route::post('/update-profile', [CustomerController::class, 'update'])->name('frn.customer.update');
+    Route::post('/upgrade-profile', [CustomerController::class, 'upgrade'])->name('frn.customer.upgrade');
     Route::get('/add-product', [CustomerController::class, 'addProduct'])->name('frn.customer.shop-add');
     Route::post('/save-product', [CustomerController::class, 'saveProduct'])->name('frn.customer.shop-save');
     Route::get('/checkout', [CustomerController::class, 'checkout'])->name('frn.customer.checkout');
@@ -69,15 +73,27 @@ Route::prefix('admin')->group(function () {
     
     //Customer
     Route::get('/customers', [UserController::class, 'index'])->name('bcn.customer.index');
+    Route::get('/customers-verify', [UserController::class, 'verify_user'])->name('bcn.customer.verify-user');
+    Route::get('/customers/{id}', [UserController::class, 'detail'])->name('bcn.customer.detail');
+    Route::get('/customers/verify/{id}', [UserController::class, 'detailVerify'])->name('bcn.customer.verify-detail');
+    Route::post('/customers/verify/{id}', [UserController::class, 'processVerify'])->name('bcn.customer.verify-process');
 
     //Posts
-    Route::get('/blogs', [BlogController::class, 'blog'])->name('bcn.post.blog');
+    Route::get('/posts', [BlogController::class, 'blog'])->name('bcn.post.blog');
     Route::get('/add-blog', [BlogController::class, 'addBlog'])->name('bcn.post.add-blog');
     Route::post('/add-blog-image', [BlogController::class, 'imageUpload'])->name('cms.blog.image.upload');
     Route::post('/save-blog', [BlogController::class, 'storeBlog'])->name('bcn.post.store-blog');
+    Route::get('/videos', [BlogController::class, 'video'])->name('bcn.post.video');
+    Route::post('/save-video', [BlogController::class, 'storeVideo'])->name('bcn.post.store-video');
+    
 
     //Products
     Route::get('/products', [ProductController::class, 'index'])->name('bcn.post.product');
+
+    //Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('bcn.setting.index');
+    Route::post('/save-rajaongkir', [SettingController::class, 'saveRajaongkir'])->name('bcn.setting.save-rajaongkir');
+    Route::post('/save-midtrans', [SettingController::class, 'saveMidtrans'])->name('bcn.setting.save-midtrans');
 
 });
 

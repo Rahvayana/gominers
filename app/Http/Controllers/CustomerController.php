@@ -8,8 +8,10 @@ use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Province;
+use App\Models\Rajaongkir;
 use App\Models\Regencie;
 use App\Models\Shop;
+use App\Models\VerifyUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -131,9 +133,10 @@ class CustomerController extends Controller
         if (isset(Auth::guard('customer')->user()['id']) != null) {
             $data['provinces']=Province::all();
             $data['regencies']=Regencie::all();
-            // dd($data);
             $data['shop']=Shop::where('user_id',Auth::guard('customer')->id())->first();
+            $data['shipments']=Rajaongkir::select('shipments')->first();
             // dd($data);
+
             return view('frontend.home.dashboard.profile',$data);
         }else{
             return redirect()->route('home')->with('failed', 'Not Login');;
@@ -151,6 +154,35 @@ class CustomerController extends Controller
         $customer->kota=$city->name;
         $customer->save();
         return redirect()->back();
+    }
+
+    public function upgrade(Request $request)
+    {
+        $request->validate([
+            'nik' => 'required|max:16|min:16',
+            'ktp' => 'required',
+            'selfie_ktp' => 'required|image',
+        ]);
+        
+        $customer = new Customer();
+        $customer=Customer::find(Auth::guard('customer')->id());
+        $customer->seller=2;
+        $customer->save();
+
+        $ktp = time().'-'.rand() . Auth::guard('customer')->id() . '.' . $request->ktp->extension();
+        $request->ktp->move('images/shop/verify/', $ktp);
+        
+        $selfie_ktp = time().'-'.rand() . Auth::guard('customer')->id(). '.' . $request->selfie_ktp->extension();
+        $request->selfie_ktp->move('images/shop/verify/', $selfie_ktp);
+
+        $verify=new VerifyUser();
+        $verify->nik=$request->nik;
+        $verify->ktp='images/shop/verify/' . $ktp;
+        $verify->ktp_selfie='images/shop/verify/' . $selfie_ktp;
+        $verify->save();
+
+        return redirect()->back()->with('success', 'Tunggu Konfirmasi Admin 1X24 Jam');
+
     }
 
     public function kota($id)

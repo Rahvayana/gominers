@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Post;
 use App\Models\Product;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,9 +52,10 @@ class HomeController extends Controller
             }
         }
 
-        $data['blogs']=DB::table('posts')->select('posts.*','users.name as author','users.foto')->where('category','tips')
+        $data['blogs']=DB::table('posts')->select('posts.*','users.name as author','users.foto')
         ->leftJoin('users','users.id','posts.user_id')->orderBy('created_at','DESC')->get();
         $data['products']=Product::orderBy('created_at','DESC')->get();
+        $data['videos']=Video::all();
         // dd($data);
 
         return view('frontend.home.index',$data);
@@ -61,7 +63,7 @@ class HomeController extends Controller
 
     public function detailBlog($slug)
     {
-        $data['blog']=DB::table('posts')->select('posts.*','users.name as author','users.foto')->where('category','tips')
+        $data['blog']=DB::table('posts')->select('posts.*','users.name as author','users.foto')
         ->leftJoin('users','users.id','posts.user_id')->where('slug',$slug)->first();
         $data['latests']=DB::table('posts')->select('posts.*','users.name as author','users.foto')->where('category','tips')
         ->leftJoin('users','users.id','posts.user_id')->where('slug','!=',$slug)->take(4)->get();

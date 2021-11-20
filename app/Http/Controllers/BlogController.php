@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +18,9 @@ class BlogController extends Controller
 
     public function blog()
     {
-        $data['blogs']=DB::table('posts')->select('posts.*','users.name as author','users.foto')->where('category','tips')
-        ->leftJoin('users','users.id','posts.user_id')->orderBy('created_at','DESC')->paginate(5);
+        $data['blogs']=DB::table('posts')->select('posts.*','users.name as author','users.foto')
+        ->leftJoin('users','users.id','posts.user_id')->orderBy('created_at','DESC')->get();
+       
         return view('backend.post.blog',$data);
     }
 
@@ -77,7 +79,25 @@ class BlogController extends Controller
         } else {
             return redirect()->route('bcn.post.add-blog')->with('failed', 'Adding New Blog Failed');
         }
+    }
 
+    public function video()
+    {
+         $data['videos']=DB::table('videos')->select('videos.*','users.name as author','users.foto')
+        ->leftJoin('users','users.id','videos.user_id')->orderBy('created_at','DESC')->get();
+        return view('backend.post.video',$data);
+    }
+
+    public function storeVideo(Request $request)
+    {
+        $request->validate([
+            'link_video' => 'required',
+        ]);
+        $video=new Video();
+        $video->link=$request->link_video;
+        $video->user_id=Auth::id();
+        $video->save();
+        return redirect()->route('bcn.post.blog');
 
     }
 }
