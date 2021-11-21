@@ -177,6 +177,7 @@ class CustomerController extends Controller
 
         $verify=new VerifyUser();
         $verify->nik=$request->nik;
+        $verify->user_id=Auth::guard('customer')->id();
         $verify->ktp='images/shop/verify/' . $ktp;
         $verify->ktp_selfie='images/shop/verify/' . $selfie_ktp;
         $verify->save();
