@@ -231,7 +231,7 @@
                             </a></div>
                         <div class="st-dropdown-content-group">
                             <h3 class="link-title"><i class="fas fa-money-check-alt icon"></i> Checkout</h3>
-                            <div class="ms-5"><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-customer.html">Customer <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-shipping.html">Shipping Information <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-payment.html">Payment Methods <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-confirmation.html">Order Review <i class="fas fa-angle-right ms-2"></i></a></div>
+                            <div class="ms-5"><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-customer.html">Customer <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-shipping.html">Shipping Information <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/checkout-payment.html">Payment Methods <i class="fas fa-angle-right ms-2"></i> </a><a class="dropdown-item text-secondary" target="_blank" href="../shop/{{ route('frn.customer.transactions') }}">Order Review <i class="fas fa-angle-right ms-2"></i></a></div>
                         </div>
                     </div>
                 </div>

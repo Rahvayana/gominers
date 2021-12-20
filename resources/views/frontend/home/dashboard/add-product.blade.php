@@ -33,7 +33,7 @@
                     <i class="far fa-credit-card me-2"></i>
                     <span class="d-none d-md-inline">Payment</span> 
                 </a>
-                <a href="checkout-confirmation.html" class="nav-item nav-link">
+                <a href="{{ route('frn.customer.transactions') }}" class="nav-item nav-link">
                     <i class="far fa-check-square me-2"></i> 
                     <span class="d-none d-md-inline">Confirmation</span>
                 </a>

@@ -1,6 +1,5 @@
 @extends('layouts.frontend')
 @section('content')
-<main class="overflow-hidden">
 <section class="checkout-header page header bg-dark section">
     <div class="container bring-to-front pt-5 pb-0">
         <div class="page-title">
@@ -33,7 +32,7 @@
                 <i class="far fa-credit-card me-2"></i>
                 <span class="d-none d-md-inline">Payment</span> 
             </a>
-            <a href="checkout-confirmation.html" class="nav-item nav-link">
+            <a href="{{ route('frn.customer.transactions') }}" class="nav-item nav-link">
                 <i class="far fa-check-square me-2"></i> 
                 <span class="d-none d-md-inline">Confirmation</span>
             </a>
@@ -68,7 +67,7 @@
                         </div>
                         <div class="col-lg-2">
                             <input type="hidden" name="product_id[]" id="product_id" value="{{$cart['id']}}">
-                            <input readonly class="form-control" name="qty[]" id="qty" disabled value="{{$cart['qty']}}">
+                            <input readonly class="form-control" name="qty[]" id="qty" value="{{$cart['qty']}}">
                         </div>
                     </div>
                     @endforeach
@@ -138,7 +137,7 @@
                                         <div class="card-header"><a href="#" class="card-title btn bold" data-bs-toggle="collapse" data-bs-target="#clp-promo"><i class="fas fa-angle-down angle"></i>Apply Promo Code</a></div>
                                         <div id="clp-promo" class="collapse" data-bs-parent="#cart-options">
                                             <div class="card-body">
-                                                <div class="mb-3"><input class="form-control" type="text" placeholder="Promo Code"></div>
+                                                <div class="mb-3"><input class="form-control" type="text" name="promo" placeholder="Promo Code"></div>
                                                 <div class="d-grid"><button class="btn btn-outline-primary" type="submit">Apply Promo Code</button></div>
                                             </div>
                                         </div>
@@ -167,7 +166,6 @@
         </form>
     </div>
 </section>
-</main>
 @endsection
 
 @section('script')

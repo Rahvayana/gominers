@@ -11,6 +11,7 @@ use App\Models\Province;
 use App\Models\Rajaongkir;
 use App\Models\Regencie;
 use App\Models\Shop;
+use App\Models\Transaction;
 use App\Models\VerifyUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -197,7 +198,7 @@ class CustomerController extends Controller
         $customer=new Customer();
         $customer=Customer::find(Auth::guard('customer')->id());
         $customer->no_hp=$request->number_phone;
-        $customer->otp=$this->intCodeRandom();
+        $customer->otp=$this->intCodeRandom(6);
         $customer->save();
         if($customer){
             return response()->json('Berhasil Mengirim OTP');
@@ -219,7 +220,7 @@ class CustomerController extends Controller
         }
     }
 
-    public function intCodeRandom($length = 6)
+    public function intCodeRandom($length)
     {
       $intMin = (10 ** $length) / 10; // 100...
       $intMax = (10 ** $length) - 1;  // 999...
@@ -239,6 +240,56 @@ class CustomerController extends Controller
         }else{
             return redirect()->route('home')->with('failed', 'Not Login');;
         }
+    }
+
+    public function transaction()
+    {   
+        $data['approveds']=DB::table('transactions')
+        ->select('transactions.*','customers.name as buyer','shops.name as seller')
+        ->leftJoin('customers','customers.id','transactions.user_id')
+        ->leftJoin('shops','shops.id','transactions.shop_id')
+        ->where('transactions.shop_id',Auth::guard('customer')->id())
+        ->where('transactions.status','APPROVED')
+        ->orderBy('transactions.created_at','DESC')->get();
+        $data['processeds']=DB::table('transactions')
+        ->select('transactions.*','customers.name as buyer','shops.name as seller')
+        ->leftJoin('customers','customers.id','transactions.user_id')
+        ->leftJoin('shops','shops.id','transactions.shop_id')
+        ->where('transactions.shop_id',Auth::guard('customer')->id())
+        ->where('transactions.status','PROCESSED')
+        ->orderBy('transactions.created_at','DESC')->get();
+        $data['completeds']=DB::table('transactions')
+        ->select('transactions.*','customers.name as buyer','shops.name as seller')
+        ->leftJoin('customers','customers.id','transactions.user_id')
+        ->leftJoin('shops','shops.id','transactions.shop_id')
+        ->where('transactions.shop_id',Auth::guard('customer')->id())
+        ->where('transactions.status','COMPLETED')
+        ->orderBy('transactions.created_at','DESC')->get();
+        // dd($data);
+        return view('frontend.home.dashboard.transactions',$data);
+    }
+
+    public function transactionDetail($invoice)
+    {
+        $invoice_data=Transaction::where('invoice_id',$invoice)->first();
+        $data['transaction']=DB::table('transactions')
+        ->select('transactions.*','customers.name as buyer','shops.name as seller')
+        ->leftJoin('customers','customers.id','transactions.user_id')
+        ->leftJoin('shops','shops.id','transactions.shop_id')
+        ->where('transactions.invoice_id',$invoice)->first();
+        $data['invoice']=Transaction::where('invoice_id',$invoice)->first();
+        $data['products']=Product::whereIn('id',json_decode($invoice_data->product_id))->get();
+        // dd($data);
+        return view('frontend.home.dashboard.detail-transactions',$data);
+    }
+
+    public function transactionDetailProcessed($id)
+    {
+        $transaction=new Transaction();
+        $transaction=Transaction::where('invoice_id',$id)->first();
+        $transaction->status='PROCESSED';
+        $transaction->save();
+        return redirect()->route('frn.customer.transactions');
     }
 
     public function addProduct()
@@ -282,8 +333,10 @@ class CustomerController extends Controller
         $data['products']=DB::table('carts')->select('products.*','carts.qty','carts.id as cart_id')
         ->leftJoin('products','products.id','carts.product_id')
         ->where('carts.user_id',Auth::guard('customer')->id())->get();
+        dd($data);
         return view('frontend.home.dashboard.cart',$data);
     }
+    
 
     public function deleteCart(Request $request)
     {
@@ -318,7 +371,55 @@ class CustomerController extends Controller
 
     public function order(Request $request)
     {
-        dd($request);
+        $kode=$this->intCodeRandom(3);
+        $invoice="INV-".$this->intCodeRandom(5).$kode;
+        $transaction=new Transaction();
+        $transaction->invoice_id=$invoice;
+        $transaction->user_id=Auth::guard('customer')->id();
+        $transaction->product_id=json_encode($request->product_id);
+        $transaction->qty=json_encode($request->qty);
+        $transaction->random_id=$kode;
+        $transaction->kurir=$request->kurir;
+        $transaction->provinsi=$request->provinsi;
+        $transaction->kota=$request->kota;
+        $transaction->kecamatan=$request->kecamatan;
+        $transaction->alamat=$request->address;
+        $transaction->ongkir=$request->ongkir;
+        $transaction->nama=$request->atas_nama;
+        $transaction->no_hp=$request->nomor;
+        $transaction->promo=$request->promo;
+        $transaction->total_harga=$request->total_pembayaran;
+        $transaction->save();
+
+        $cart=new Cart();
+        $cart=Cart::where('user_id',Auth::guard('customer')->id())->get();
+        $cart->each->delete();
+
+        //Kasih pengurangan stok ketika order
+
+        return redirect()->route('frn.customer.confirm-order',$invoice)->with('success','Sukses Melakukan Order');
+
+    }
+
+    public function confirmOrder($invoice)
+    {
+        $invoice_data=Transaction::where('invoice_id',$invoice)->first();
+        $data['invoice']=Transaction::where('invoice_id',$invoice)->first();
+        $data['products']=Product::whereIn('id',json_decode($invoice_data->product_id))->get();
+        // dd($data);
+        return view('frontend.home.dashboard.confirmation-order',$data);
+    }
+
+    public function confirmOrderProcess(Request $request,$id)
+    {
+        $request->validate(['bukti_transfer'=>'required|']);
+        $bukti_tf = time().'-'.rand() . '.' . $request->bukti_transfer->extension();
+        $request->bukti_transfer->move('images/bukti_tf/', $bukti_tf);
+        $transaction=new Transaction();
+        $transaction=Transaction::where('invoice_id',$id)->first();
+        $transaction->bukti_transfer='images/bukti_tf/' . $bukti_tf;
+        $transaction->save();
+        return redirect()->route('frn.customer.checkout');
     }
 
     public function updateShop(Request $request)

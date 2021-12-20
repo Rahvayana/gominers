@@ -25,7 +25,7 @@
                     <i class="fas fa-shopping-cart me-2"></i>
                     <span class="d-none d-md-inline">Checkout</span>
                 </a>
-                <a href="{{ route('frn.customer.shop') }}" class="nav-item nav-link active">
+                <a href="{{ route('frn.customer.shop') }}" class="nav-item nav-link">
                     <i class="far fa-address-card me-2"></i>
                     <span class="d-none d-md-inline">Shop</span>
                 </a>
@@ -33,19 +33,85 @@
                     <i class="far fa-credit-card me-2"></i>
                     <span class="d-none d-md-inline">Payment</span> 
                 </a>
-                <a href="{{ route('frn.customer.transactions') }}" class="nav-item nav-link">
+                <a href="{{ route('frn.customer.transactions') }}" class="nav-item nav-link active">
                     <i class="far fa-check-square me-2"></i> 
-                    <span class="d-none d-md-inline">Confirmation</span>
+                    <span class="d-none d-md-inline">Transactions</span>
                 </a>
             </nav>
         </div><!-- BreadCrumb -->
         <div class="bg-light shadow-sm">
     </section><!-- Customer info -->
-    <section class="section">
-        <div class="container pt-0 mt-n8">
+    <section class="section block bg-contrast">
+        <div class="container py-4">
+            <div class="section-heading text-center">
+                <h2 class="bold">Detail Transactions</h2>
+            </div>
             <div class="row">
-                <div class="col-lg-12 pt-8">
-                    <a href="{{ route('frn.customer.shop-add') }}" class="btn btn-primary mt-5">Tambah Barang</a>
+                <div class="col-md-12 col-lg-12 mx-auto">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Bukti Transfer</td>
+                                <td>:</td>
+                                <td><img src="/{{$invoice->bukti_transfer??''}}" alt="" srcset="" width="200"></td>
+                            </tr>
+                            <tr>
+                                <td>Nama</td>
+                                <td>:</td>
+                                <td>{{$invoice->nama}}</td>
+                            </tr>
+                            <tr>
+                                <td>No HP</td>
+                                <td>:</td>
+                                <td>{{$invoice->no_hp}}</td>
+                            </tr>
+                            <tr>
+                                <td>Provinsi</td>
+                                <td>:</td>
+                                <td>{{$invoice->provinsi}}</td>
+                            </tr>
+                            <tr>
+                                <td>Kota</td>
+                                <td>:</td>
+                                <td>{{$invoice->kota}}</td>
+                            </tr>
+                            <tr>
+                                <td>Kecamatan</td>
+                                <td>:</td>
+                                <td>{{$invoice->kecamatan}}</td>
+                            </tr>
+                            <tr>
+                                <td>Alamat</td>
+                                <td>:</td>
+                                <td>{{$invoice->alamat}}</td>
+                            </tr>
+                            <tr>
+                                <td>Kurir</td>
+                                <td>:</td>
+                                <td>{{$invoice->kurir}}</td>
+                            </tr>
+                            <tr>
+                                <td>Total Harga</td>
+                                <td>:</td>
+                                <td>Rp. {{number_format($invoice->total_harga)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Ongkir</td>
+                                <td>:</td>
+                                <td>Rp. {{number_format($invoice->ongkir)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>:</td>
+                                <td>{{$invoice->status}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Daftar Barang yang dibeli</h2>
                     @foreach ($products as $product)
                     <div class="row border-bottom py-4">
                         <div class="col-lg-8">
@@ -60,13 +126,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <button class="btn btn-primary">Edit</button>
-                            <button class="btn btn-danger">Delete</button>
-                        </div>
                     </div>
                     @endforeach
-                    <div class="d-grid"><button class="btn btn-outline-primary mt-4" type="button"><i class="fas fa-redo me-2"></i>Update cart</button></div>
+                    <div class="d-grid">
+                        <form action="{{ route('frn.customer.transactions-processed',$invoice->invoice_id) }}" method="POST">@csrf
+                            <button class="btn btn-outline-primary mt-4" type="submit">Process Order</button>
+                        </form>
+                    </div>
                 </div><!-- Sidebar-->
             </div>
         </div>

@@ -36,7 +36,7 @@
                     <i class="far fa-credit-card me-2"></i>
                     <span class="d-none d-md-inline">Payment</span> 
                 </a>
-                <a href="checkout-confirmation.html" class="nav-item nav-link">
+                <a href="{{ route('frn.customer.transactions') }}" class="nav-item nav-link">
                     <i class="far fa-check-square me-2"></i> 
                     <span class="d-none d-md-inline">Confirmation</span>
                 </a>
@@ -48,12 +48,12 @@
     <section class="section">
         <div class="container pt-0 mt-n8">
             <div class="row">
+                @if(Session::has('success'))
+                <div class="col-lg-12">
+                    <div class="alert alert-success" style="margin-top: -70px;">{{Session::get('success')}}</div>
+                </div>
+                @endif
                 <div class="col-lg-12 pt-9">
-                    @if(Session::has('success'))
-                    <div class="col-lg-12">
-                        <div class="alert alert-success" style="margin-top: -70px;">{{Session::get('success')}}</div>
-                    </div>
-                    @endif
                     @if ($errors->any())
                     <div class="col-lg-12">
                         <div class="alert alert-danger">

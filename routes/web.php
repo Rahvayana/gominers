@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -43,11 +44,16 @@ Route::prefix('user')->group(function () {
     Route::get('/logout', [CustomerController::class, 'logout'])->name('frn.customer.logout');
     Route::get('/dashboard-profile', [CustomerController::class, 'detail'])->name('frn.customer.detail');
     Route::get('/dashboard-shop', [CustomerController::class, 'shop'])->name('frn.customer.shop');
+    Route::get('/dashboard-transactions', [CustomerController::class, 'transaction'])->name('frn.customer.transactions');
+    Route::get('/dashboard-transactions/{id}', [CustomerController::class, 'transactionDetail'])->name('frn.customer.transactions-detail');
+    Route::post('/dashboard-transactions/{id}', [CustomerController::class, 'transactionDetailProcessed'])->name('frn.customer.transactions-processed');
     Route::post('/update-profile', [CustomerController::class, 'update'])->name('frn.customer.update');
     Route::post('/upgrade-profile', [CustomerController::class, 'upgrade'])->name('frn.customer.upgrade');
     Route::get('/add-product', [CustomerController::class, 'addProduct'])->name('frn.customer.shop-add');
     Route::post('/save-product', [CustomerController::class, 'saveProduct'])->name('frn.customer.shop-save');
     Route::get('/checkout', [CustomerController::class, 'checkout'])->name('frn.customer.checkout');
+    Route::get('/confirmation-order/{id}', [CustomerController::class, 'confirmOrder'])->name('frn.customer.confirm-order');
+    Route::post('/confirmation-order/{id}', [CustomerController::class, 'confirmOrderProcess'])->name('frn.customer.confirm-order-process');
     Route::post('/delete-cart', [CustomerController::class, 'deleteCart'])->name('frn.customer.delete-cart');
     Route::post('/process-cart', [CustomerController::class, 'processCart'])->name('frn.customer.process-cart');
     Route::post('/update-shop', [CustomerController::class, 'updateShop'])->name('frn.customer.update-shop');
@@ -94,6 +100,11 @@ Route::prefix('admin')->group(function () {
     Route::get('/settings', [SettingController::class, 'index'])->name('bcn.setting.index');
     Route::post('/save-rajaongkir', [SettingController::class, 'saveRajaongkir'])->name('bcn.setting.save-rajaongkir');
     Route::post('/save-midtrans', [SettingController::class, 'saveMidtrans'])->name('bcn.setting.save-midtrans');
+
+    //Transaction
+    Route::get('/transactions', [TransactionController::class, 'index'])->name('bcn.transaction.index');
+    Route::get('/transactions/{id}', [TransactionController::class, 'detail'])->name('bcn.transaction.detail');
+    Route::post('/transactions-process/{id}', [TransactionController::class, 'processTransaction'])->name('bcn.transaction.process');
 
 });
 
